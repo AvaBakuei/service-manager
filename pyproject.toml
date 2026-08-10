@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "service-manager"
+version = "0.1.0"
+description = "A CLI tool for managing Docker services"
+requires-python = ">=3.10"
+
+dependencies = [
+    "typer",
+    "pyyaml",
+    "jinja2",
+    "httpx",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
+[project.scripts]
+service-manager = "service_manager.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
