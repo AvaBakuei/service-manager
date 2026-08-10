@@ -1,22 +1,17 @@
 # Service Manager
 
-A Python application for managing and monitoring services.
+A CLI tool for defining and managing Docker services.
 
-## Project Description
+## Requirements
 
-This project is created as a learning project to practice Python,
-Git, GitHub, and service management concepts.
-
-## Technologies
-
-- Python
+- Python 3.10+
 - Git
-- GitHub
 
-## Setup
+## Installation
 
-Clone the repository:
+Create and activate a virtual environment:
 
 ```bash
-git clone https://github.com/USERNAME/service-manager.git
-cd service-manager
+python3 -m venv .venv
+source .venv/bin/activate
+```
