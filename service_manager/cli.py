@@ -1,14 +1,16 @@
 import typer
 from pathlib import Path
-
+from typing import Annotated
+from rich.console import Console
 from .project import initialize_project
-from .exceptions import ProjectAlreadyExistsError, ServiceAlreadyExistsError
+from .exceptions import ProjectAlreadyExistsError, ServiceAlreadyExistsError, ServiceDoesNotExistError
 from .models import Service
-from .validation import validate_service
-from .config import load_config, save_config
-from .validation import validate_service_name, validate_service
+from .validation import validate_service, validate_service_name
+from .config import load_config, save_config, get_config_path
+from .service import services_list, show_service
 
 app = typer.Typer()
+console = Console()
 
 
 @app.callback()
@@ -23,9 +25,9 @@ def init():
 
     try:
         initialize_project(Path.cwd())  # cwd = Current Working Directory
-        print("Project initialized successfully.")
+        typer.echo("Project initialized successfully.")
     except ProjectAlreadyExistsError as error:
-        print(f"Error: {error}")
+        typer.echo(f"Error: {error}")
 
 
 @app.command()
@@ -49,19 +51,45 @@ def add():
         )
 
         validate_service(service)
-        print(service)
 
-        config_path = Path.cwd() / "services.yml"
-        config = load_config(config_path)
+        config = load_config(get_config_path())
 
         validate_service_name(name, config["services"])
         config["services"][name] = service.to_dict()
-        save_config(config_path, config)
+        save_config(get_config_path(), config)
 
         typer.echo(f"Service '{name}' added successfully.")
 
     except (ValueError, ServiceAlreadyExistsError) as error:
         typer.echo(f"Error: {error}")
+
+
+@app.command("list")
+def list_services():
+    """ Show a List of Services. """
+    config = load_config(get_config_path())
+
+    try:
+        table = services_list(config)
+        console.clear()
+        console.print(table)
+    except ServiceDoesNotExistError as error:
+        typer.secho(
+            f"Error: {error}",
+            fg=typer.colors.RED
+        )
+
+
+@app.command()
+def show(service_name: Annotated[str, typer.Argument(help="The name of the service")]):
+    config = load_config(get_config_path())
+    try:
+        show_service(service_name, config)
+    except ServiceDoesNotExistError as error:
+        typer.secho(
+            f"Error: {error}",
+            fg=typer.colors.RED
+        )
 
 
 if __name__ == "__main__":
