@@ -4,3 +4,7 @@ class ProjectAlreadyExistsError(Exception):
 
 class ServiceAlreadyExistsError(Exception):
     """ Raised when a service already exists. """
+
+
+class ServiceDoesNotExistError(Exception):
+    """ Raised when a service does not exists. """

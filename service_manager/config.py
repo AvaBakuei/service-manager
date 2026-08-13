@@ -26,3 +26,7 @@ def save_config(path: Path, data: dict) -> None:
             sort_keys=False,
             allow_unicode=True
         )
+
+
+def get_config_path() -> Path:
+    return Path.cwd() / "services.yml"
