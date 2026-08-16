@@ -1,0 +1,18 @@
+services:
+{% for service in services %}
+{% if service.enabled %}
+  {{ service.name }}:
+    image: {{ service.image }}
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.{{ service.name }}.rule=Host(`{{ service.domain }}`)
+      - traefik.http.services.{{ service.name }}.loadbalancer.server.port={{ service.internal_port }}
+{% endif %}
+{% endfor %}
+
+networks:
+  proxy:
+    external: true
