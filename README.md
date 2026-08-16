@@ -15,3 +15,9 @@ Create and activate a virtual environment:
 python3 -m venv .venv
 source .venv/bin/activate
 ```
+
+### Generate Docker Compose
+
+```bash
+service-manager generate
+```

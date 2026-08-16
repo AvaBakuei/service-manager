@@ -8,6 +8,7 @@ from .models import Service
 from .validation import validate_service, validate_service_name
 from .config import load_config, save_config, get_config_path
 from .service import services_list, show_service
+from .generator import generate_compose
 
 app = typer.Typer()
 console = Console()
@@ -82,6 +83,7 @@ def list_services():
 
 @app.command()
 def show(service_name: Annotated[str, typer.Argument(help="The name of the service")]):
+    """ Show a Service. """
     config = load_config(get_config_path())
     try:
         show_service(service_name, config)
@@ -90,6 +92,17 @@ def show(service_name: Annotated[str, typer.Argument(help="The name of the servi
             f"Error: {error}",
             fg=typer.colors.RED
         )
+
+
+@app.command()
+def generate():
+    """Generate Docker Compose configuration."""
+    output_path = Path.cwd() / "generated" / "docker-compose.yml"
+    config = load_config(get_config_path())
+    generate_compose(list(config["services"].values()), output_path)
+    typer.echo(
+        f"Docker Compose file generated at {output_path}"
+    )
 
 
 if __name__ == "__main__":
