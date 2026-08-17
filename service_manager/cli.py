@@ -9,6 +9,7 @@ from .validation import validate_service, validate_service_name, validate_config
 from .config import load_config, save_config, get_config_path
 from .service import services_list, show_service
 from .generator import generate_compose
+from .docker import compose_up, compose_down, compose_ps, compose_logs
 
 app = typer.Typer()
 console = Console()
@@ -119,6 +120,30 @@ def validate():
         raise typer.Exit(code=1)
 
     typer.secho("Configuration is valid.", fg=typer.colors.GREEN)
+
+
+@app.command()
+def up():
+    """Start all services."""
+    compose_up()
+
+
+@app.command()
+def down():
+    """Stop and remove all services."""
+    compose_down()
+
+
+@app.command()
+def ps():
+    """Show running services."""
+    compose_ps()
+
+
+@app.command()
+def logs(service_name: Annotated[str, typer.Argument(help="The name of the service")]):
+    """Show service logs."""
+    compose_logs(service_name)
 
 
 if __name__ == "__main__":
