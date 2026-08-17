@@ -5,7 +5,7 @@ from rich.console import Console
 from .project import initialize_project
 from .exceptions import ProjectAlreadyExistsError, ServiceAlreadyExistsError, ServiceDoesNotExistError
 from .models import Service
-from .validation import validate_service, validate_service_name
+from .validation import validate_service, validate_service_name, validate_config
 from .config import load_config, save_config, get_config_path
 from .service import services_list, show_service
 from .generator import generate_compose
@@ -103,6 +103,22 @@ def generate():
     typer.echo(
         f"Docker Compose file generated at {output_path}"
     )
+
+
+@app.command()
+def validate():
+    """Validate the service configuration."""
+    config = load_config(get_config_path())
+    errors = validate_config(config)
+
+    if errors:
+        typer.secho("Configuration validation failed:", fg=typer.colors.RED)
+        for error in errors:
+            typer.echo(f"- {error}")
+
+        raise typer.Exit(code=1)
+
+    typer.secho("Configuration is valid.", fg=typer.colors.GREEN)
 
 
 if __name__ == "__main__":
