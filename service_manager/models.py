@@ -12,3 +12,14 @@ class Service:
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Service":
+        return cls(
+            name=data["name"],
+            image=data["image"],
+            internal_port=data["internal_port"],
+            domain=data["domain"],
+            enabled=data["enabled"],
+            health_path=data["health_path"],
+        )
