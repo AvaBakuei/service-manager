@@ -10,6 +10,7 @@ from .config import load_config, save_config, get_config_path
 from .service import services_list, show_service
 from .generator import generate_compose
 from .docker import compose_up, compose_down, compose_ps, compose_logs
+from .health import health_check, health_check_all
 
 app = typer.Typer()
 console = Console()
@@ -144,6 +145,52 @@ def ps():
 def logs(service_name: Annotated[str, typer.Argument(help="The name of the service")]):
     """Show service logs."""
     compose_logs(service_name)
+
+
+def print_health_result(service_name: str, result: dict) -> None:
+    typer.echo(f"Service: {service_name}")
+    typer.echo(f"Status: {result['status']}")
+
+    if result["error"]:
+        typer.echo(f"Error: {result['error']}")
+        return
+
+    typer.echo(f"HTTP Status: {result['http_status']}")
+    typer.echo(f"Response Time: {result['response_time']} ms")
+
+
+@app.command()
+def health(
+    service_name: Annotated[
+        str | None,
+        typer.Argument(help="The name of the service")
+    ] = None,
+    all: bool = typer.Option(
+        False,
+        "--all",
+        help="Check all services"
+    ),
+):
+    """Check service health."""
+
+    config = load_config(get_config_path())
+    services = config["services"]
+
+    if all:
+        results = health_check_all(services)
+
+        for service_name, result in results.items():
+            print_health_result(service_name, result)
+
+        return
+
+    if service_name not in services:
+        raise ServiceDoesNotExistError(
+            f"Service '{service_name}' does not exist."
+        )
+
+    result = health_check(services[service_name])
+    print_health_result(service_name, result)
 
 
 if __name__ == "__main__":

@@ -35,3 +35,52 @@ def test_logs(mock_compose_logs):
 
     assert result.exit_code == 0
     mock_compose_logs.assert_called_once_with("whoami")
+
+
+@patch("service_manager.cli.health_check")
+def test_health(mock_health_check):
+    mock_health_check.return_value = {
+        "status": "Healthy",
+        "http_status": 200,
+        "response_time": 42,
+        "error": None,
+    }
+
+    result = runner.invoke(app, ["health", "whoami"])
+
+    assert result.exit_code == 0
+    mock_health_check.assert_called_once()
+
+    assert "Service: whoami" in result.stdout
+    assert "Status: Healthy" in result.stdout
+    assert "HTTP Status: 200" in result.stdout
+    assert "Response Time: 42 ms" in result.stdout
+
+
+@patch("service_manager.cli.health_check_all")
+def test_health_all(mock_health_check_all):
+    mock_health_check_all.return_value = {
+        "whoami": {
+            "status": "Healthy",
+            "http_status": 200,
+            "response_time": 42,
+            "error": None,
+        },
+        "api": {
+            "status": "Unhealthy",
+            "http_status": None,
+            "response_time": None,
+            "error": "Connection timed out",
+        },
+    }
+
+    result = runner.invoke(app, ["health", "--all"])
+
+    assert result.exit_code == 0
+    mock_health_check_all.assert_called_once()
+
+    assert "Service: whoami" in result.stdout
+    assert "Status: Healthy" in result.stdout
+    assert "Service: api" in result.stdout
+    assert "Status: Unhealthy" in result.stdout
+    assert "Error: Connection timed out" in result.stdout
