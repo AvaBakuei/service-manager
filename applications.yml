@@ -1,0 +1,13 @@
+applications:
+
+  - name: whoami
+    image: traefik/whoami
+    domain: whoami.example.com
+    internal_port: 80
+    enabled: true
+
+  - name: nginx-test
+    image: nginx:alpine
+    domain: nginx-test.example.com
+    internal_port: 80
+    enabled: true

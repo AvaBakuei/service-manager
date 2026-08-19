@@ -1,0 +1,8 @@
+applications:
+{% for app in applications %}
+  - name: {{ app.name }}
+    image: {{ app.image }}
+    domain: {{ app.domain }}
+    internal_port: {{ app.internal_port }}
+    enabled: {{ "true" if app.enabled else "false" }}
+{% endfor %}
