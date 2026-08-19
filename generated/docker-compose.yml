@@ -1,0 +1,30 @@
+services:
+
+
+  whoami:
+    image: traefik/whoami
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.whoami.rule=Host(`whoami.example.com`)
+      - traefik.http.services.whoami.loadbalancer.server.port=80
+
+
+
+  nginx-test:
+    image: nginx:alpine
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.nginx-test.rule=Host(`nginx-test.example.com`)
+      - traefik.http.services.nginx-test.loadbalancer.server.port=80
+
+
+
+networks:
+  proxy:
+    external: true

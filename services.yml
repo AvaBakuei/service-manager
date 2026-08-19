@@ -1,0 +1,15 @@
+services:
+  whoami:
+    name: whoami
+    image: traefik/whoami
+    internal_port: 80
+    domain: whoami.example.com
+    enabled: true
+    health_path: /
+  nginx-test:
+    name: nginx-test
+    image: nginx:alpine
+    internal_port: 80
+    domain: nginx-test.example.com
+    enabled: true
+    health_path: /

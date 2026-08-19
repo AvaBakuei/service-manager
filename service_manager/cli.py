@@ -8,7 +8,7 @@ from .models import Service
 from .validation import validate_service, validate_service_name, validate_config
 from .config import load_config, save_config, get_config_path
 from .service import services_list, show_service
-from .generator import generate_compose
+from .generator import generate_compose, generate_applications
 from .docker import compose_up, compose_down, compose_ps, compose_logs
 from .health import health_check, health_check_all
 
@@ -99,11 +99,21 @@ def show(service_name: Annotated[str, typer.Argument(help="The name of the servi
 @app.command()
 def generate():
     """Generate Docker Compose configuration."""
+
     output_path = Path.cwd() / "generated" / "docker-compose.yml"
+    applications_path = Path.cwd() / "applications.yml"
+
     config = load_config(get_config_path())
-    generate_compose(list(config["services"].values()), output_path)
+    services = list(config["services"].values())
+
+    generate_compose(services, output_path)
+    generate_applications(services, applications_path)
+
     typer.echo(
         f"Docker Compose file generated at {output_path}"
+    )
+    typer.echo(
+        f"Applications file generated at {applications_path}"
     )
 
 
